@@ -4,26 +4,36 @@ import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import AppBar from "@material-ui/core/AppBar";
 import CameraIcon from "@material-ui/icons/PhotoCamera";
-
+import * as ReactBootStrap from "react-bootstrap";
+import Loader from "react-loader-spinner";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 const useStyles = makeStyles((theme) => ({
   h2: {
     color: "#616161",
-    background: "transparent",
-    frontSize: "50px",
-    //backgroundColor:'#30336b',
-    //padding: "0px 0 0px 0",
-    marginBottom: "10px",
-    width: "70%",
+    fontSize: "15px",
+    fontWeight: "bold",
+  },
+  h4: {
+    color: "#000",
+    marginTop: "50",
+    fontSize: "25px",
+    fontWeight: "bold",
   },
   h1: {
     color: "#7E7E7E",
     background: "transparent",
     frontSize: "100px",
-    //backgroundColor:'#30336b',
     padding: "6px 0 2px 0",
     marginBottom: "10px",
     width: "70%",
     boxShadow: "5px 5px 15px -5px rgba(0, 0, 0, 0.3)",
+  },
+  h3: {
+    background: "transparent",
+    fontSize: "40px",
+    letterSpacing: "4",
+    width: "90%",
+    fontWeight: "bold",
   },
   center_div: {
     width: "50%",
@@ -76,16 +86,38 @@ export default function Move() {
   const classes = useStyles();
   const [num, setNum] = React.useState(0);
   const [name, setName] = React.useState("");
-  const [nbcours, setNbcours] = React.useState("");
-  const [nbtotal, setNbtotal] = React.useState("");
+  const [nbcours, setNbcours] = React.useState(0);
+  const [nbtotal, setNbtotal] = React.useState(0);
   const [description, setDescription] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
 
-  const suivant = () => {
-    alert("suivant");
-  };
-  const actualiser = () => {
-    alert("actualiser");
-  };
+  async function suivant() {
+    setLoading(true);
+    const url =
+      "https://cors-anywhere.herokuapp.com/https://mighty-temple-86101.herokuapp.com/api/myturn/service/put/" +
+      global.qr;
+    const response = await fetch(url, {
+      method: "PUT",
+    });
+    const data = await response.json();
+    setNbcours(data.nbcours);
+    setNbtotal(data.nbtotal);
+    setLoading(false);
+  }
+
+  async function actualiser() {
+    setLoading(true);
+    const url =
+      "https://cors-anywhere.herokuapp.com/https://mighty-temple-86101.herokuapp.com/api/myturn/service/put/actualiser/" +
+      global.qr;
+    const response = await fetch(url, {
+      method: "PUT",
+    });
+    const data = await response.json();
+    setNbcours(0);
+    setNbtotal(0);
+    setLoading(false);
+  }
 
   React.useEffect(() => {
     async function fetchData() {
@@ -100,39 +132,46 @@ export default function Move() {
       setNbcours(data[0].nbcours);
       setNbtotal(data[0].nbtotal);
       console.log(name);
+      setLoading(false);
     }
-     fetchData();
+    fetchData();
   }, []);
 
   return (
     <>
       <AppBar position="relative">
         <Toolbar>
-          <CameraIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
-            ID: {global.service}
+            ID : {global.service}
           </Typography>
         </Toolbar>
       </AppBar>
+
       <div className={classes.main_div}>
         <div className={classes.center_div}>
-          <h1>{name}</h1>
-          <h2 className={classes.h2}>{description}</h2>
-          <h1>Nombre en cours :</h1>
+          <Loader
+            type="Puff"
+            color="#30336b"
+            height={80}
+            width={80}
+            visible={loading}
+            marginTop={5}
+          />
+          <text className={classes.h3}>{name}</text>
+          <text className={classes.h2}>{description}</text>
+          <h1></h1>
+          <text className={classes.h4}>Nombre en cours :</text>
           <h2 className={classes.h1}>{nbcours} </h2>
 
-          <h1>Nombre Total:</h1>
+          <text className={classes.h4}>Nombre Total:</text>
           <h2 className={classes.h1}>{nbtotal}</h2>
 
           <div className={classes.btn_div}>
             <button className={classes.button} onClick={() => suivant()}>
-              {" "}
-              Suivant
+              <h3> Suivant</h3>
             </button>
-
             <button className={classes.button} onClick={() => actualiser()}>
-              {" "}
-              Actualiser{" "}
+              <h3> Actualiser </h3>
             </button>
           </div>
         </div>
